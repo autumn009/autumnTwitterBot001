@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net.Mail;
 using System.Text;
 using Tweetinvi;
 
@@ -19,48 +20,55 @@ if( args.Length > 0)
 
 for (int i = 1; ; i++)
 {
-    report.AppendLine($"order={i}");
-    var src = Path.Combine(from, i.ToString() + "_authinfo.txt");
-    if (!File.Exists(src)) break;
-    // read seed & counter
-    int seed = 0, counter = 0;
-    var seedFileName = Path.Combine(from, i.ToString() + "_seed.txt");
-    var counterFileName = Path.Combine(from, i.ToString() + "_counter.txt");
-    if (File.Exists(seedFileName)) int.TryParse(File.ReadAllText(seedFileName), out seed);
-    if (File.Exists(counterFileName)) int.TryParse(File.ReadAllText(counterFileName), out counter);
-    report.AppendLine($"seed={seed}");
-    report.AppendLine($"counter={counter}");
-    // read auth info
-    loadInfo(src);
-    // read base data
-    string[] lines = loadData(Path.Combine(from, i.ToString() + "_data.txt"));
-    // fix seed & counter
-    if (seed == 0 || counter >= lines.Length)
+    try
     {
-        report.AppendLine("Reseting");
-        seed = Random.Shared.Next(1, int.MaxValue);
-        counter = 1;
-        File.WriteAllText(seedFileName, seed.ToString());
+        report.AppendLine($"order={i}");
+        var src = Path.Combine(from, i.ToString() + "_authinfo.txt");
+        if (!File.Exists(src)) break;
+        // read seed & counter
+        int seed = 0, counter = 0;
+        var seedFileName = Path.Combine(from, i.ToString() + "_seed.txt");
+        var counterFileName = Path.Combine(from, i.ToString() + "_counter.txt");
+        if (File.Exists(seedFileName)) int.TryParse(File.ReadAllText(seedFileName), out seed);
+        if (File.Exists(counterFileName)) int.TryParse(File.ReadAllText(counterFileName), out counter);
         report.AppendLine($"seed={seed}");
         report.AppendLine($"counter={counter}");
+        // read auth info
+        loadInfo(src);
+        // read base data
+        string[] lines = loadData(Path.Combine(from, i.ToString() + "_data.txt"));
+        // fix seed & counter
+        if (seed == 0 || counter >= lines.Length)
+        {
+            report.AppendLine("Reseting");
+            seed = Random.Shared.Next(1, int.MaxValue);
+            counter = 1;
+            File.WriteAllText(seedFileName, seed.ToString());
+            report.AppendLine($"seed={seed}");
+            report.AppendLine($"counter={counter}");
+        }
+        // create table
+        var random = new Random(seed);
+        var table = Enumerable.Range(0, lines.Length).ToArray();
+        for (int j = 0; j < lines.Length; j++)
+        {
+            var k = random.Next(0, lines.Length - 1);
+            (table[j], table[k]) = (table[k], table[j]);
+        }
+        var targetLine = lines[counter++];
+        File.WriteAllText(counterFileName, counter.ToString());
+        await tweet(consumerKey, consumerSecret, accessToken, accessTokenSecret, targetLine);
+        report.AppendLine($"Tweeted: {targetLine}");
     }
-    // create table
-    var random = new Random(seed);
-    var table = Enumerable.Range(0, lines.Length).ToArray();
-    for (int j = 0; j < lines.Length; j++)
+    catch(Exception e)
     {
-        var k = random.Next(0, lines.Length - 1);
-        (table[j], table[k]) = (table[k], table[j]);
+        report.Append(e.ToString());
     }
-    var targetLine = lines[counter++];
-    File.WriteAllText(counterFileName, counter.ToString());
-    await tweet(consumerKey, consumerSecret, accessToken, accessTokenSecret, targetLine);
-    report.AppendLine($"Tweeted: {targetLine}");
 }
 
 if (testMode)
 {
-    var filename = Path.Combine(from,"test.txt");
+    var filename = Path.Combine(from, "test.txt");
     File.WriteAllText(filename, report.ToString());
     var startInfo = new System.Diagnostics.ProcessStartInfo(filename);
     startInfo.UseShellExecute = true;
@@ -68,7 +76,10 @@ if (testMode)
 }
 else
 {
-    // TBW send by mail
+    var filename = Path.Combine(from, "mail.txt");
+    var mailAddress = File.ReadAllText(filename);
+    SmtpClient client = new SmtpClient("127.0.0.1");
+    client.Send(mailAddress, mailAddress, "autumnTwitterBot001 report " + DateTime.Now.ToString("yyMMddHHmmss"), report.ToString());
 }
 
 string[] loadData(string filename)
