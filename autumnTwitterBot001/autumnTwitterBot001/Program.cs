@@ -22,9 +22,9 @@ for (int i = 1; ; i++)
 {
     try
     {
-        report.AppendLine($"order={i}");
         var src = Path.Combine(from, i.ToString() + "_authinfo.txt");
         if (!File.Exists(src)) break;
+        report.AppendLine($"order={i}");
         // read seed & counter
         int seed = 0, counter = 0;
         var seedFileName = Path.Combine(from, i.ToString() + "_seed.txt");
