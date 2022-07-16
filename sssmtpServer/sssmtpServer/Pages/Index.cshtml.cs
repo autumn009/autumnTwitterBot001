@@ -12,9 +12,23 @@ namespace sssmtpServer.Pages
             _logger = logger;
         }
 
+        private void testSend()
+        {
+            // TBW
+        }
+
         public void OnGet()
         {
 
         }
+        public void OnPost(string labelValue)
+        {
+            if (labelValue == "投稿テスト") testSend();
+            else
+            {
+
+            }
+        }
     }
+
 }
