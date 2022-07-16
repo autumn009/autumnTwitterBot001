@@ -66,20 +66,15 @@ for (int i = 1; ; i++)
     }
 }
 
+var logPath = Path.Combine(from, "Logs");
+Directory.CreateDirectory(logPath);
+var filename = Path.Combine(logPath, "autumnTwitterBot001_" + DateTime.Now.ToString("yyMMddHHmmss"));
+File.WriteAllText(filename, report.ToString());
 if (testMode)
 {
-    var filename = Path.Combine(from, "test.txt");
-    File.WriteAllText(filename, report.ToString());
     var startInfo = new System.Diagnostics.ProcessStartInfo(filename);
     startInfo.UseShellExecute = true;
     System.Diagnostics.Process.Start(startInfo);
-}
-else
-{
-    var filename = Path.Combine(from, "mail.txt");
-    var mailAddress = File.ReadAllText(filename);
-    SmtpClient client = new SmtpClient("127.0.0.1");
-    client.Send(mailAddress, mailAddress, "autumnTwitterBot001 report " + DateTime.Now.ToString("yyMMddHHmmss"), report.ToString());
 }
 
 string[] loadData(string filename)
