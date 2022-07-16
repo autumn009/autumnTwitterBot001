@@ -57,8 +57,8 @@ for (int i = 1; ; i++)
         }
         var targetLine = lines[counter++];
         File.WriteAllText(counterFileName, counter.ToString());
+        report.AppendLine($"Tweeting: {targetLine}");
         await tweet(consumerKey, consumerSecret, accessToken, accessTokenSecret, targetLine);
-        report.AppendLine($"Tweeted: {targetLine}");
     }
     catch(Exception e)
     {
