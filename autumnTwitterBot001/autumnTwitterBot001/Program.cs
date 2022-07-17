@@ -55,7 +55,7 @@ for (int i = 1; ; i++)
             var k = random.Next(0, lines.Length - 1);
             (table[j], table[k]) = (table[k], table[j]);
         }
-        var targetLine = lines[counter++];
+        var targetLine = lines[table[counter++]];
         File.WriteAllText(counterFileName, counter.ToString());
         report.AppendLine($"Tweeting: {targetLine}");
         await tweet(consumerKey, consumerSecret, accessToken, accessTokenSecret, targetLine);

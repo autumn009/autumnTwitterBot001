@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\sssmtpSenderLib\sssmtpSenderLib.csproj" />
+  </ItemGroup>
+
 </Project>
