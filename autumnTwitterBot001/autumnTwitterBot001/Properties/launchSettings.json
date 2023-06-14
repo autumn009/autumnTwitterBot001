@@ -1,8 +1,7 @@
 {
   "profiles": {
     "autumnTwitterBot001": {
-      "commandName": "Project",
-      "commandLineArgs": "test"
+      "commandName": "Project"
     }
   }
 }
