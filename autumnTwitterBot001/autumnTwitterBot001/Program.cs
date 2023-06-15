@@ -90,11 +90,13 @@ string[] loadData(string filename)
         if (s == null) break;
         s = s.Trim();
         if (s.Length == 0) continue;
+#if HTTP_CHECK
         if (!s.ToLower().Contains("http"))
         {
             report.AppendLine($"WARING: {s} is not contains 'http'");
             continue;
         }
+#endif
         lines.Add(s);
     }
     return lines.ToArray();
