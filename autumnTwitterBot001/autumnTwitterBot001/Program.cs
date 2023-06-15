@@ -69,7 +69,7 @@ for (int i = 1; ; i++)
     }
 }
 
-var logPath = Path.Combine(from, "Logs");
+var logPath = Path.Combine(from, $"Logs\\{DateTime.Now:yyyyMM}");
 Directory.CreateDirectory(logPath);
 var filename = Path.Combine(logPath, "autumnTwitterBot001_" + DateTime.Now.ToString("yyMMddHHmmss") + ".txt");
 File.WriteAllText(filename, report.ToString());
